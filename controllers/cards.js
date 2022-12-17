@@ -44,7 +44,7 @@ const deleteCard = async (req, res) => {
     }
 
   } catch (err) {
-    return res.status(500).json({ message: 'Error while deleting card' });
+    return res.status(400).json({ message: 'Error while deleting card' });
   }
 };
 
@@ -76,7 +76,7 @@ const removeLike = (req, res) => {
     )
     .catch((err) => {
       console.log(err.message),
-        res.status(500).json({ message: 'Error in card dislike' });
+        res.status(400).json({ message: 'Error in card dislike' });
     })
 };
 
