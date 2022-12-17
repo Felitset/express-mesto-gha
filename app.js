@@ -11,8 +11,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(bodyparser.json());
 
-app.use('/users', user);
-
 app.use((req, res, next) => {
   req.user = {
     _id: '639089097eb07f07a8168945'
@@ -20,6 +18,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.use('/users', user);
+
 app.use('/cards', card);
 
 

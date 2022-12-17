@@ -3,13 +3,14 @@ const Card = require('../models/card');
 
 const getAllCards = (req, res) => {
   Card.find({})
-    .then((card) => {
-      if (!card) {
+    .then((cards) => {
+      if (!cards) {
         res.status(404).send({ message: 'No card found' })
       }
+      return cards
     })
     .then((cards) => {
-      res.send(cards);
+      res.json(cards);
     })
     .catch((error) => res.status(500).send({ message: 'Error while getting all cards' }));
 };
@@ -23,7 +24,7 @@ const postCard = async (req, res) => {
     return res.status(201).json(card);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: 'Error while creating card' });
+    return res.status(400).json({ message: 'Error while creating card' });
   }
 };
 
@@ -59,7 +60,7 @@ const setLike = (req, res) => {
     )
     .catch((err) => {
       console.log(err.message),
-        res.status(500).json({ message: 'Error in card like' });
+        res.status(400).json({ message: 'Error in card like' });
     })
 };
 

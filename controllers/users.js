@@ -14,7 +14,7 @@ const getUsers = (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.userId;
     const user = await User.findById(id);
 
     if (!user) {
@@ -24,7 +24,7 @@ const getUser = async (req, res) => {
 
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: 'Error while getting user' });
+    return res.status(400).json({ message: 'Error while getting user' });
   }
 };
 
@@ -35,13 +35,13 @@ const createUser = async (req, res) => {
     return res.status(201).json(user);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: 'not created user' });
+    return res.status(400).json({ message: 'not created user' });
   }
 };
 
 const updateProfileInfo = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.body._id, {
+    const user = await User.findByIdAndUpdate(req.user._id, {
       name: req.body.name,
       about: req.body.about
     },
@@ -54,22 +54,22 @@ const updateProfileInfo = async (req, res) => {
       }
     return res.status(200).send(user);
   } catch (err) {
-    return res.status(500).json({ message: 'Error while updating profile info' });
+    return res.status(400).json({ message: 'Error while updating profile info' });
   }
 };
 
 const updateUserAvatar = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.body._id, {
+    const user = await User.findByIdAndUpdate(req.user._id, {
       avatar: req.body.avatar
     },
       {
         new: true,
         runValidators: true
       });
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' })
-      }
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
     return res.status(200).send(user);
   } catch (err) {
     return res.status(500).json({ message: 'Error while updating avatar' });
