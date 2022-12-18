@@ -40,7 +40,7 @@ const deleteCard = async (req, res) => {
       card.deleteOne();
       return res.status(200).json({ message: 'Card deleted successfuly' });
     } else {
-      return res.status(400).json({ message: 'Owner does not match user.id' });
+      return res.status(404).json({ message: 'Owner does not match user.id' });
     }
 
   } catch (err) {
@@ -54,6 +54,11 @@ const setLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
+  .then((cardId) => {
+    if (!cardId) {
+      res.status(404).json({ message: 'No card found' });
+    }
+  })
     .then((card) => {
       res.status(200).send(card)
     }
@@ -70,6 +75,11 @@ const removeLike = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
+  .then((cardId) => {
+    if (!cardId) {
+      res.status(404).json({ message: 'No card found' });
+    }
+  })
     .then((card) => {
       res.status(200).send(card)
     }

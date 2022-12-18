@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyparser = require('body-parser');
 const user = require('./routes/user.js');
 const card = require('./routes/card.js');
+const error = require('./routes/wrong-route.js');
 
 const PORT = 3000;
 
@@ -22,7 +23,7 @@ app.use((req, res, next) => {
 app.use('/users', user);
 
 app.use('/cards', card);
-
+app.use('*', error);
 
 app.listen(PORT, ()=>{
     console.log(`listening on ${PORT}`);
