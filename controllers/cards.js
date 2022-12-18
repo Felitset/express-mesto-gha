@@ -30,12 +30,14 @@ const postCard = async (req, res) => {
 
 const deleteCard = async (req, res) => {
   try {
-    let card = await Card.findById(req.params.cardId);
-    const ownerId = card.owner.toString();
-    let userId = req.user._id.toString();
+    let cardId = req.params.cardId
+    let card = await Card.findById(cardId);
     if (!card) {
       return res.status(404).json({ message: 'Card does not exist' });
-    }
+    };
+    const ownerId = card.owner.toString();
+    let userId = req.user._id.toString();
+
     if (ownerId === userId) {
       card.deleteOne();
       return res.status(200).json({ message: 'Card deleted successfuly' });
@@ -81,7 +83,7 @@ const removeLike = (req, res) => {
     }
   })
     .then((card) => {
-      res.status(200).send(card)
+      res.status(200).json({ message: 'Like removed from card' });
     }
     )
     .catch((err) => {
