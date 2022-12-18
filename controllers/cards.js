@@ -60,7 +60,7 @@ const setLike = (req, res) => {
     }
   })
     .then((card) => {
-      res.status(200).send(card)
+      res.status(200).json({ message: 'Like set for card' });
     }
     )
     .catch((err) => {
