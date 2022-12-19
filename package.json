@@ -8,7 +8,8 @@
     "dev": "nodemon app.js",
     "lint": "npx eslint ."
   },
-  "author": "",
+  "author": "Olga Nefedova",
+  "about": "Project sprint-13 creating server",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.1",
@@ -20,7 +21,6 @@
     "eslint": "^8.30.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-react": "^7.31.11",
     "nodemon": "^2.0.20"
   },
   "repository": {

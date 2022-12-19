@@ -1,7 +1,6 @@
 const router = require('express').Router();
-const {wrongData} = require('../controllers/error');
+const { wrongData } = require('../controllers/error');
 
-
-router.patch('*', wrongData);
+router.all('*', wrongData);
 
 module.exports = router;
