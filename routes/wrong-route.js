@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { wrongData } = require('../controllers/error');
+const { pageNotFound } = require('../controllers/error');
 
-router.all('*', wrongData);
+router.all('*', pageNotFound);
 
 module.exports = router;
