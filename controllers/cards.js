@@ -28,18 +28,12 @@ const postCard = async (req, res) => {
 
 const deleteCard = async (req, res) => {
   try {
-    const { cardId } = req.params.cardId;
+    const { cardId } = req.params;
     const card = await Card.findById(cardId);
     if (!card) {
       return res.status(notFoundError).json({ message: 'Card does not exist' });
     }
-    const ownerId = card.owner.toString();
-    const userId = req.user._id.toString();
-
-    if (ownerId !== userId) {
-      return res.status(wrongDataError).json({ message: 'Owner does not match user.id' });
-    }
-    return card.deleteOne(() => res.json({ message: 'Card deleted successfuly' }));
+    return card.deleteOne(() => res.status(200).json({ message: 'Card deleted successfuly' }));
   } catch (err) {
     if (err.name === 'CastError') {
       return res.status(wrongDataError).json({ message: 'Cast Error' });
