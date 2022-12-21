@@ -1,7 +1,8 @@
 const Card = require('../models/card');
 
-const internalError = 500;
-const wrongDataError = 400;
+const internalError = '500';
+const wrongDataError = '400';
+const notFoundError = '404';
 
 const getAllCards = (req, res) => {
   Card.find({})
@@ -17,8 +18,11 @@ const postCard = async (req, res) => {
   try {
     const card = await Card.create({ name, link, owner });
     return res.json(card);
-  } catch (e) {
-    return res.status(wrongDataError).json({ message: 'Error while creating card' });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return res.status(wrongDataError).json({ message: 'Validation Error' });
+    }
+    return res.status(internalError).json({ message: 'Error while posting new card' });
   }
 };
 
@@ -27,7 +31,7 @@ const deleteCard = async (req, res) => {
     const { cardId } = req.params.cardId;
     const card = await Card.findById(cardId);
     if (!card) {
-      return res.status(wrongDataError).json({ message: 'Card does not exist' });
+      return res.status(notFoundError).json({ message: 'Card does not exist' });
     }
     const ownerId = card.owner.toString();
     const userId = req.user._id.toString();
@@ -37,7 +41,10 @@ const deleteCard = async (req, res) => {
     }
     return card.deleteOne(() => res.json({ message: 'Card deleted successfuly' }));
   } catch (err) {
-    return res.status(wrongDataError).json({ message: 'Error while deleting card' });
+    if (err.name === 'CastError') {
+      return res.status(wrongDataError).json({ message: 'Cast Error' });
+    }
+    return res.status(internalError).json({ message: 'Error while deleting card' });
   }
 };
 
@@ -49,13 +56,16 @@ const setLike = (req, res) => {
   )
     .then((cardId) => {
       if (!cardId) {
-        res.status(404).json({ message: 'No card found' });
+        res.status(notFoundError).json({ message: 'No card found' });
       } else {
         res.json({ message: 'Like set for card' });
       }
     })
-    .catch(() => {
-      res.status(wrongDataError).json({ message: 'Error in card like' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(wrongDataError).json({ message: 'Cast Error' });
+      }
+      res.status(internalError).json({ message: 'Error while setting card like' });
     });
 };
 
@@ -67,13 +77,16 @@ const removeLike = (req, res) => {
   )
     .then((cardId) => {
       if (!cardId) {
-        res.status(404).json({ message: 'No card found' });
+        res.status(notFoundError).json({ message: 'No card found' });
       } else {
-        res.status(200).json({ message: 'Like removed from card' });
+        res.json({ message: 'Like removed from card' });
       }
     })
-    .catch(() => {
-      res.status(wrongDataError).json({ message: 'Error in card dislike' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(wrongDataError).json({ message: 'Cast Error' });
+      }
+      res.status(internalError).json({ message: 'Error while removing card like' });
     });
 };
 

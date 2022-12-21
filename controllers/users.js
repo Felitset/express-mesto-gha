@@ -2,6 +2,7 @@ const User = require('../models/user');
 
 const internalError = 500;
 const wrongDataError = 400;
+const notFoundError = '404';
 
 const getUsers = (req, res) => {
   User.find({})
@@ -17,11 +18,14 @@ const getUser = async (req, res) => {
     const user = await User.findById(id);
 
     if (!user) {
-      return res.status(wrongDataError).json({ message: 'User not found' });
+      return res.status(notFoundError).json({ message: 'User not found' });
     }
     return res.json(user);
-  } catch (e) {
-    return res.status(wrongDataError).json({ message: 'Error while getting user' });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(wrongDataError).json({ message: 'Cast Error' });
+    }
+    return res.status(internalError).json({ message: 'Error while getting user' });
   }
 };
 
@@ -29,8 +33,11 @@ const createUser = async (req, res) => {
   try {
     const user = await User.create(req.body);
     return res.json(user);
-  } catch (e) {
-    return res.status(wrongDataError).json({ message: 'Error while getting user' });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return res.status(wrongDataError).json({ message: 'Validation Error' });
+    }
+    return res.status(internalError).json({ message: 'Error while creating new user' });
   }
 };
 
@@ -48,11 +55,14 @@ const updateProfileInfo = async (req, res) => {
       },
     );
     if (!user) {
-      return res.status(wrongDataError).json({ message: 'User not found' });
+      return res.status(notFoundError).json({ message: 'User not found' });
     }
     return res.send(user);
   } catch (err) {
-    return res.status(wrongDataError).json({ message: 'Error while updating profile info' });
+    if (err.name === 'ValidationError') {
+      return res.status(wrongDataError).json({ message: 'Validation Error' });
+    }
+    return res.status(internalError).json({ message: 'Error while updating profile information' });
   }
 };
 
@@ -69,11 +79,14 @@ const updateUserAvatar = async (req, res) => {
       },
     );
     if (!user) {
-      return res.status(wrongDataError).json({ message: 'No user found' });
+      return res.status(notFoundError).json({ message: 'No user found' });
     }
     return res.send(user);
   } catch (err) {
-    return res.status(internalError).json({ message: 'Error while updating avatar' });
+    if (err.name === 'ValidationError') {
+      return res.status(wrongDataError).json({ message: 'Validation Error' });
+    }
+    return res.status(internalError).json({ message: 'Error while updating user avatar' });
   }
 };
 
