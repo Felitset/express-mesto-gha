@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyparser = require('body-parser');
+const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const error = require('./routes/wrong-route');
@@ -12,17 +13,29 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(bodyparser.json());
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), createUser);
 app.use(auth);
 app.use('/users', require('./routes/user'));
 app.use('/cards', require('./routes/card'));
 
 app.use('*', error);
-
-// app.use((err, req, res, next) => {
-//   res.status(500).send({ message: 'На сервере произошла ошибка' });
-// });
+app.use(errors());
+app.use((err, req, res, next) => {
+  // console.log(err.statusCode);
+  const status = err.statusCode || 500;
+  res.status(status).send({ message: err.message });
+});
 
 app.listen(PORT, () => {
   console.log(`listening on ${PORT}`);

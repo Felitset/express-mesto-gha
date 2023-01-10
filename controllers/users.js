@@ -4,34 +4,33 @@ const User = require('../models/user');
 
 const internalError = 500;
 const wrongDataError = 400;
-const notFoundError1 = 404;
-// const NotFoundError = require('../errors/not-found-error');
+const WrongDataError = require('../errors/wrong-data');
 
-const getUsers = (req, res) => {
+const notFoundError1 = 404;
+const NotFoundError = require('../errors/not-found-error');
+
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
+      if (!users) {
+        throw new WrongDataError('Ошибка при запросе пользователей');
+      }
       res.send(users);
     })
-    .catch(() => res.status(wrongDataError).json({ message: 'Error while getting users' }));
+    .catch(next);
 };
 
-const getUser = async (req, res) => {
-  try {
-    const id = req.params.userId;
-    const user = await User.findById(id);
-
+const getUser = (req, res, next) => User
+  .findById(req.user._id)
+  .then((user) => {
+    console.log(req.user._id);
+    console.log(user);
     if (!user) {
-      return res.status(notFoundError1).json({ message: 'User not found' });
-      // throw new NotFoundError('Нет пользователя с таким id');
+      throw new NotFoundError('Нет пользователя с таким id11');
     }
-    return res.json(user);
-  } catch (err) {
-    if (err.name === 'CastError') {
-      return res.status(wrongDataError).json({ message: 'Cast Error' });
-    }
-    return res.status(internalError).json({ message: 'Error while getting user' });
-  }
-};
+    return res.send(user);
+  })
+  .catch(next);
 
 const getCurrentUser = async (req, res) => {
   const user = await User.findById(req.user._id);
@@ -41,7 +40,7 @@ const getCurrentUser = async (req, res) => {
   return res.json(user);
 };
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   const hash = await bcrypt.hash(req.body.password, 10);
   return User.create({
     name: req.body.name,
@@ -50,35 +49,51 @@ const createUser = async (req, res) => {
     email: req.body.email,
     password: hash,
   })
-    .then((user) => res.send(user))
-    .catch((err) => res.status(wrongDataError).send(err));
+    .then((user) => {
+      if (!user) {
+        throw new WrongDataError('Неверные данные пользователя');
+      }
+      res.send(user);
+    })
+    .catch(next);
 };
 
-const updateProfileInfo = async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        name: req.body.name,
-        about: req.body.about,
-      },
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
+const updateProfileInfo = (req, res, next) => User
+  .findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      about: req.body.about,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+  // .then((err) => {
+  //   console.log('PPPPPPPPPPP');
+  //   if (err.name === 'ValidationError') {
+  //     throw new WrongDataError('Ошибка валида2ции');
+  //     // return res.status(wrongDataError).json({ message: 'Validation Error' });
+  //   }
+  // })
+  .then((user) => {
+    // console.log(user);
     if (!user) {
-      return res.status(notFoundError1).json({ message: 'User not found1' });
-      // throw new NotFoundError('Нет пользователя с таким id');
+      throw new NotFoundError('Нет пользователя с таким id');
     }
     return res.send(user);
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res.status(wrongDataError).json({ message: 'Validation Error' });
-    }
-    return res.status(internalError).json({ message: 'Error while updating profile information' });
-  }
-};
+  })
+  .catch(next);
+//   } catch (err) {
+//     if (err.name === 'ValidationError') {
+//       throw new WrongDataError('Ошибка валидации');
+//       // return res.status(wrongDataError).json({ message: 'Validation Error' });
+//     }
+//     return res.status(internalError)
+// .json({ message: 'Error while updating profile information' });
+//   }
+// };
 
 const updateUserAvatar = async (req, res) => {
   try {
