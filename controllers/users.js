@@ -6,6 +6,8 @@ const internalError = 500;
 const wrongDataError = 400;
 const WrongDataError = require('../errors/wrong-data');
 
+const NonUniqueEmailError = require('../errors/non-unique-email');
+
 const notFoundError1 = 404;
 const NotFoundError = require('../errors/not-found-error');
 
@@ -41,6 +43,13 @@ const getCurrentUser = async (req, res) => {
 };
 
 const createUser = async (req, res, next) => {
+  await User.findOne({ email: req.body.email })
+    .then((currentUser) => {
+      if (currentUser) {
+        throw new NonUniqueEmailError('Такой имейл уже используется');
+      }
+    })
+    .catch(next);
   const hash = await bcrypt.hash(req.body.password, 10);
   return User.create({
     name: req.body.name,
@@ -53,7 +62,7 @@ const createUser = async (req, res, next) => {
       if (!user) {
         throw new WrongDataError('Неверные данные пользователя');
       }
-      res.send({
+      return res.send({
         name: req.body.name,
         about: req.body.about,
         avatar: req.body.avatar,
