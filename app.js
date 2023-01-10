@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyparser = require('body-parser');
-const user = require('./routes/user');
-const card = require('./routes/card');
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 const error = require('./routes/wrong-route');
 
 const PORT = 3000;
@@ -12,18 +12,17 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(bodyparser.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '639089097eb07f07a8168945',
-  };
+app.post('/signin', login);
+app.post('/signup', createUser);
+app.use(auth);
+app.use('/users', require('./routes/user'));
+app.use('/cards', require('./routes/card'));
 
-  next();
-});
-
-app.use('/users', user);
-
-app.use('/cards', card);
 app.use('*', error);
+
+// app.use((err, req, res, next) => {
+//   res.status(500).send({ message: 'На сервере произошла ошибка' });
+// });
 
 app.listen(PORT, () => {
   console.log(`listening on ${PORT}`);
