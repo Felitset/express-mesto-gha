@@ -53,7 +53,12 @@ const createUser = async (req, res, next) => {
       if (!user) {
         throw new WrongDataError('Неверные данные пользователя');
       }
-      res.send(user);
+      res.send({
+        name: req.body.name,
+        about: req.body.about,
+        avatar: req.body.avatar,
+        email: req.body.email,
+      });
     })
     .catch(next);
 };
