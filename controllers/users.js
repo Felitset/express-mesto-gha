@@ -10,6 +10,7 @@ const NonUniqueEmailError = require('../errors/non-unique-email');
 
 const notFoundError1 = 404;
 const NotFoundError = require('../errors/not-found-error');
+const { listenerCount } = require('../models/user');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -140,7 +141,7 @@ const login = async (req, res) => {
     .then((user) => {
       if (!user) {
         // throw new NotFoundError('Нет пользователя с таким id');
-        return res.status(notFoundError1).json({ message: 'User not found' });
+        return res.status(401).json({ message: 'User not found' });
       }
       if (!user.password) {
         return res.status(401).json({ message: 'User hae no password' });
