@@ -34,7 +34,7 @@ const deleteCard = async (req, res) => {
     if (!card) {
       return res.status(notFoundError).json({ message: 'Card does not exist' });
     }
-    if (card.ownerId !== user._id) {
+    if (card.ownerId !== req.user._id) {
       return res.status(403).json({ message: 'невозможно удалить не свою карточку' });
     }
     return card.deleteOne(() => res.status(200).json({ message: 'Card deleted successfuly' }));
