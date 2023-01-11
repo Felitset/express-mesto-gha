@@ -112,7 +112,7 @@ const login = async (req, res, next) => {
   await User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Нет пользователя с таким id');
+        throw new NonExistingDataError('Нет пользователя с таким id');
       }
       if (!user.password) {
         throw new NonExistingDataError('Неправильные пароль или почта');
