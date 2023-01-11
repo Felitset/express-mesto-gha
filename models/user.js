@@ -32,7 +32,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
     select: false,
   },
 });
@@ -52,22 +51,6 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(email,
         });
     });
 };
-
-// userSchema.statics.findUserByCredentials = function (email, password) {
-//   return this.findOne({ email })
-//     .then((user) => {
-//       if (!user) {
-//         return Promise;
-//       }
-//       return bcrypt.compare(password, user.password)
-//         .then((matched) => {
-//           if (!matched) {
-//             return Promise;
-//           }
-//           return user;
-//         });
-//     });
-// };
 
 const user = mongoose.model('user', userSchema);
 

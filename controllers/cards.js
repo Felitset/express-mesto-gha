@@ -13,11 +13,10 @@ const getAllCards = (req, res, next) => Card
   })
   .catch(next);
 
-const postCard = async (req, res, next) => {
+const postCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
-
-  await Card
+  Card
     .create({ name, link, owner })
     .then((card) => {
       res.json(card);
@@ -25,9 +24,9 @@ const postCard = async (req, res, next) => {
     .catch(next);
 };
 
-const deleteCard = async (req, res, next) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  await Card
+  Card
     .findById(cardId)
     .then((card) => {
       if (!card) {
