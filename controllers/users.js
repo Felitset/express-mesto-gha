@@ -24,12 +24,10 @@ const getUsers = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => User
-  .findById(req.user._id)
+  .findById(req.params.userId)
   .then((user) => {
-    console.log(req.user._id);
-    console.log(user);
     if (!user) {
-      throw new NotFoundError('Нет пользователя с таким id11');
+      throw new NotFoundError('Нет пользователя с таким id');
     }
     return res.send(user);
   })

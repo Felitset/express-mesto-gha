@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const user = require('../models/user');
 
 const internalError = 500;
 const wrongDataError = 400;
@@ -32,6 +33,9 @@ const deleteCard = async (req, res) => {
     const card = await Card.findById(cardId);
     if (!card) {
       return res.status(notFoundError).json({ message: 'Card does not exist' });
+    }
+    if (card.ownerId !== user._id) {
+      return res.status(403).json({ message: 'невозможно удалить не свою карточку' });
     }
     return card.deleteOne(() => res.status(200).json({ message: 'Card deleted successfuly' }));
   } catch (err) {
