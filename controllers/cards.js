@@ -31,11 +31,11 @@ const deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findById(cardId);
-    if (card.ownerId.toString() !== req.user._id) {
-      return res.status(403).json({ message: 'невозможно удалить не свою карточку' });
-    }
     if (!card) {
       return res.status(notFoundError).json({ message: 'Card does not exist' });
+    }
+    if (card.ownerId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'невозможно удалить не свою карточку' });
     }
     return card.deleteOne(() => res.status(200).json({ message: 'Card deleted successfuly' }));
   } catch (err) {
