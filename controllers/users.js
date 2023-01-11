@@ -10,7 +10,6 @@ const NonUniqueEmailError = require('../errors/non-unique-email');
 
 const notFoundError1 = 404;
 const NotFoundError = require('../errors/not-found-error');
-const { listenerCount } = require('../models/user');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -33,13 +32,15 @@ const getUser = (req, res, next) => User
   })
   .catch(next);
 
-const getCurrentUser = async (req, res) => {
-  const user = await User.findById(req.user._id);
-  if (!user) {
-    return res.json({ message: 'no current user' });
-  }
-  return res.json(user);
-};
+const getCurrentUser = (req, res, next) => User
+  .findById(req.user._id)
+  .then((user) => {
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден');
+    }
+    return res.json(user);
+  })
+  .catch(next);
 
 const createUser = async (req, res, next) => {
   await User.findOne({ email: req.body.email })
@@ -83,69 +84,45 @@ const updateProfileInfo = (req, res, next) => User
       runValidators: true,
     },
   )
-  // .then((err) => {
-  //   console.log('PPPPPPPPPPP');
-  //   if (err.name === 'ValidationError') {
-  //     throw new WrongDataError('Ошибка валида2ции');
-  //     // return res.status(wrongDataError).json({ message: 'Validation Error' });
-  //   }
-  // })
   .then((user) => {
-    // console.log(user);
     if (!user) {
       throw new NotFoundError('Нет пользователя с таким id');
     }
     return res.send(user);
   })
   .catch(next);
-//   } catch (err) {
-//     if (err.name === 'ValidationError') {
-//       throw new WrongDataError('Ошибка валидации');
-//       // return res.status(wrongDataError).json({ message: 'Validation Error' });
-//     }
-//     return res.status(internalError)
-// .json({ message: 'Error while updating profile information' });
-//   }
-// };
 
-const updateUserAvatar = async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        avatar: req.body.avatar,
-      },
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
+const updateUserAvatar = (req, res, next) => User
+  .findByIdAndUpdate(
+    req.user._id,
+    {
+      avatar: req.body.avatar,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+  .then((user) => {
     if (!user) {
-      return res.status(notFoundError1).json({ message: 'User not found' });
-      // throw new NotFoundError('Нет пользователя с таким id');
+      throw new NotFoundError('Нет пользователя с таким id');
     }
     return res.send(user);
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res.status(wrongDataError).json({ message: 'Validation Error' });
-    }
-    return res.status(internalError).json({ message: 'Error while updating user avatar' });
-  }
-};
+  })
+  .catch(next);
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
   await User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        // throw new NotFoundError('Нет пользователя с таким id');
-        return res.status(401).json({ message: 'User not found' });
+        throw new NotFoundError('Нет пользователя с таким id');
       }
       if (!user.password) {
-        return res.status(401).json({ message: 'User hae no password' });
+        throw new WrongDataError('Неправильные пароль или почта');
       }
       if (!bcrypt.compare(password, user.password)) {
-        return res.status(400).json({ message: 'Неправильные пароль или почта' });
+        throw new WrongDataError('Неправильные пароль или почта');
       }
       return user;
     })
@@ -158,12 +135,7 @@ const login = async (req, res) => {
 
       res.send({ token });
     })
-    .catch((err) => {
-      res.clearCookie('jwt');
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
 
 module.exports = {

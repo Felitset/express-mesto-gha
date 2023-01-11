@@ -34,10 +34,9 @@ app.use('/cards', require('./routes/card'));
 
 app.use('*', error);
 app.use(errors());
+
 app.use((err, req, res, next) => {
-  // console.log(err.statusCode);
-  const status = err.statusCode || 500;
-  res.status(status).send({ message: err.message });
+  res.status(err.statusCode).send({ message: err.message });
 });
 
 app.listen(PORT, () => {

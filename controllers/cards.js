@@ -1,9 +1,12 @@
 const Card = require('../models/card');
-const user = require('../models/user');
 
 const internalError = 500;
 const wrongDataError = 400;
 const notFoundError = 404;
+const WrongDataError = require('../errors/wrong-data');
+
+const NonUniqueEmailError = require('../errors/non-unique-email');
+const NotFoundError = require('../errors/not-found-error');
 
 const getAllCards = (req, res) => {
   Card.find({})
