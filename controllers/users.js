@@ -2,13 +2,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const internalError = 500;
-const wrongDataError = 400;
+const NonExistingDataError = require('../errors/non-existing-data');
 const WrongDataError = require('../errors/wrong-data');
-
 const NonUniqueEmailError = require('../errors/non-unique-email');
-
-const notFoundError1 = 404;
 const NotFoundError = require('../errors/not-found-error');
 
 const getUsers = (req, res, next) => {
@@ -119,7 +115,7 @@ const login = async (req, res, next) => {
         throw new NotFoundError('Нет пользователя с таким id');
       }
       if (!user.password) {
-        throw new WrongDataError('Неправильные пароль или почта');
+        throw new NonExistingDataError('Неправильные пароль или почта');
       }
       if (!bcrypt.compare(password, user.password)) {
         throw new WrongDataError('Неправильные пароль или почта');
