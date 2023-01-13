@@ -21,10 +21,7 @@ const getUsers = (req, res, next) => {
 const getUser = (req, res, next) => User
   .findById(req.params.userId)
   .then((user) => {
-    if (!user) {
-      throw new NotFoundError('Нет пользователя с таким id');
-    }
-    return res.send(user);
+    res.send(user);
   })
   .catch(next);
 
@@ -48,10 +45,8 @@ const createUser = async (req, res, next) => {
     password: hash,
   })
     .then((user) => {
-      if (!user) {
-        throw new WrongDataError('Неверные данные пользователя');
-      }
-      return res.send({
+      res.send({
+        _id: user._id,
         name: req.body.name,
         about: req.body.about,
         avatar: req.body.avatar,
@@ -102,7 +97,7 @@ const updateUserAvatar = (req, res, next) => User
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-  await User.findOne({ email }).select('+password')
+  await User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
         throw new NonExistingDataError('Нет пользователя с таким id');
@@ -126,6 +121,30 @@ const login = async (req, res, next) => {
     })
     .catch(next);
 };
+//   await User.findOne({ email }).select('+password')
+//     .then((user) => {
+//       if (!user) {
+//         throw new NonExistingDataError('Нет пользователя с таким id');
+//       }
+//       if (!user.password) {
+//         throw new NonExistingDataError('Неправильные пароль или почта');
+//       }
+//       if (!bcrypt.compare(password, user.password)) {
+//         throw new WrongDataError('Неправильные пароль или почта');
+//       }
+//       return user;
+//     })
+//     .then((user) => {
+//       const token = jwt.sign(
+//         { _id: user._id },
+//         'some-secret-key',
+//         { expiresIn: '7d' },
+//       );
+
+//       res.send({ token });
+//     })
+//     .catch(next);
+// };
 
 module.exports = {
   getUser,
