@@ -7,19 +7,20 @@ const NotFoundError = require('../errors/not-found-error');
 const AccessError = require('../errors/access-error');
 
 const getAllCards = (req, res, next) => Card
-  .find({})
+  .find({}).populate('owner').populate('likes')
   .then((cards) => {
     res.json(cards);
   })
   .catch(next);
 
-const postCard = (req, res, next) => {
+const postCard = async (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
-  Card
-    .create({ name, link, owner })
-    .then((card) => {
-      res.json(card);
+  const card = await Card
+    .create({ name, link, owner });
+  Card.findById(card._id).populate('owner')
+    .then((newcard) => {
+      res.json(newcard);
     })
     .catch(next);
 };

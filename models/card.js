@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cardSchema = new mongoose.Schema({
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     default: [],
   }],
   name: {
