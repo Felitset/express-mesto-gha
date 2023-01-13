@@ -4,7 +4,6 @@ const User = require('../models/user');
 
 const NonExistingDataError = require('../errors/non-existing-data');
 const WrongDataError = require('../errors/wrong-data');
-const NonUniqueEmailError = require('../errors/non-unique-email');
 const NotFoundError = require('../errors/not-found-error');
 
 const getUsers = (req, res, next) => {
@@ -29,7 +28,7 @@ const getCurrentUser = (req, res, next) => User
   .findById(req.user._id)
   .then((user) => {
     if (!user) {
-      throw new NotFoundError('Пользователь не найден');
+      throw new NonExistingDataError('Пользователь не найден');
     }
     return res.json(user);
   })
