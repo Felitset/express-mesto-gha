@@ -121,30 +121,6 @@ const login = async (req, res, next) => {
     })
     .catch(next);
 };
-//   await User.findOne({ email }).select('+password')
-//     .then((user) => {
-//       if (!user) {
-//         throw new NonExistingDataError('Нет пользователя с таким id');
-//       }
-//       if (!user.password) {
-//         throw new NonExistingDataError('Неправильные пароль или почта');
-//       }
-//       if (!bcrypt.compare(password, user.password)) {
-//         throw new WrongDataError('Неправильные пароль или почта');
-//       }
-//       return user;
-//     })
-//     .then((user) => {
-//       const token = jwt.sign(
-//         { _id: user._id },
-//         'some-secret-key',
-//         { expiresIn: '7d' },
-//       );
-
-//       res.send({ token });
-//     })
-//     .catch(next);
-// };
 
 module.exports = {
   getUser,
