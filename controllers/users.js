@@ -46,6 +46,7 @@ const createUser = async (req, res, next) => {
   //     }
   //   })
   //   .catch(next);
+  // будет удалено
   const hash = await bcrypt.hash(req.body.password, 10);
   return User.create({
     name: req.body.name,
