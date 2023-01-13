@@ -9,18 +9,19 @@ const NotFoundError = require('../errors/not-found-error');
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
-      if (!users) {
-        throw new WrongDataError('Ошибка при запросе пользователей');
-      }
       res.send(users);
     })
     .catch(next);
 };
 
 const getUser = (req, res, next) => User
-  .findById(req.params.userId)
+  .findOne({ _id: req.params.userId })
   .then((user) => {
-    res.send(user);
+    if (!user) {
+      throw new NotFoundError('Нет пользователя с таким id');
+    }
+
+    return res.send(user);
   })
   .catch(next);
 
