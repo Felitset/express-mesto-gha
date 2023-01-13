@@ -5,13 +5,14 @@ const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const error = require('./routes/wrong-route');
+const urlRegex = require('./consts/url-regex');
 
 const PORT = 3000;
 
 const app = express();
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.use(bodyparser.json());
+app.use(express.json());
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -23,7 +24,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri().regex(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/),
+    avatar: Joi.string().uri().regex(urlRegex),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
