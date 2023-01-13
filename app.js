@@ -37,6 +37,11 @@ app.use('*', error);
 app.use(errors());
 
 app.use((err, req, res, next) => {
+  if (err.code === 11000) {
+    res
+      .status(409)
+      .send({ message: 'User duplicate' });
+  }
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
