@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const NotFoundError = require('../errors/not-found-error');
 const WrongDataError = require('../errors/wrong-data');
+const NonExistingDataError = require('../errors/non-existing-data');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -42,7 +42,7 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(email,
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('User is not found');
+        throw new NonExistingDataError('User is not found');
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
