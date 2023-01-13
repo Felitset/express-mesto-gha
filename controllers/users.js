@@ -39,14 +39,6 @@ const getCurrentUser = (req, res, next) => User
   .catch(next);
 
 const createUser = async (req, res, next) => {
-  // await User.findOne({ email: req.body.email })
-  //   .then((currentUser) => {
-  //     if (currentUser) {
-  //       throw new NonUniqueEmailError('Такой имейл уже используется');
-  //     }
-  //   })
-  //   .catch(next);
-  // будет удалено
   const hash = await bcrypt.hash(req.body.password, 10);
   return User.create({
     name: req.body.name,
@@ -66,13 +58,7 @@ const createUser = async (req, res, next) => {
         email: req.body.email,
       });
     })
-    .catch(next)
-    .catch((err) => {
-      // ошибка аутентификации
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
 
 const updateProfileInfo = (req, res, next) => User
