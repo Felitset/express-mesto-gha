@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-// const bodyparser = require('body-parser');
+
 const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -45,6 +45,7 @@ app.use((err, req, res, next) => {
         ? 'На сервере произошла ошибка'
         : message,
     });
+  next();
 });
 
 app.listen(PORT, () => {
