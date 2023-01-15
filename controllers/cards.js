@@ -2,7 +2,6 @@ const Card = require('../models/card');
 
 const WrongDataError = require('../errors/wrong-data');
 
-const NonUniqueEmailError = require('../errors/non-unique-email');
 const NotFoundError = require('../errors/not-found-error');
 const AccessError = require('../errors/access-error');
 
@@ -22,7 +21,13 @@ const postCard = async (req, res, next) => {
     .then((newcard) => {
       res.json(newcard);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidatonError') {
+        next(new WrongDataError('Error DB validation'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const deleteCard = (req, res, next) => {
@@ -41,41 +46,61 @@ const deleteCard = (req, res, next) => {
     .then(() => {
       res.status(200).json({ message: 'Card deleted successfuly' });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new WrongDataError('WrongData'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const setLike = (req, res, next) => {
+  const { cardId } = req.params;
   Card
     .findByIdAndUpdate(
-      req.params.cardId,
+      cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     )
-    .then((cardId) => {
-      if (!cardId) {
+    .then((card) => {
+      if (!card) {
         throw new NotFoundError('Карточка не найдена');
       } else {
-        res.json(cardId);
+        res.json(card);
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new WrongDataError('WrongData'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const removeLike = (req, res, next) => {
+  const { cardId } = req.params;
   Card
     .findByIdAndUpdate(
-      req.params.cardId,
+      cardId,
       { $pull: { likes: req.user._id } },
       { new: true },
     )
-    .then((cardId) => {
-      if (!cardId) {
+    .then((card) => {
+      if (!card) {
         throw new NotFoundError('Карточка не найдена');
       } else {
-        res.json(cardId);
+        res.json(card);
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new WrongDataError('WrongData'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports = {

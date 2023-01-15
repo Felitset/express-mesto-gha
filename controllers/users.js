@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const NonExistingDataError = require('../errors/non-existing-data');
 const WrongDataError = require('../errors/wrong-data');
 const NotFoundError = require('../errors/not-found-error');
 const ConflictError = require('../errors/conflict-error');
@@ -24,7 +23,14 @@ const getUser = (req, res, next) => User
 
     return res.send(user);
   })
-  .catch(next);
+  .catch((err) => {
+    console.log(err.name);
+    if (err.name === 'CastError') {
+      next(new WrongDataError('WrongData'));
+    } else {
+      next(err);
+    }
+  });
 
 const getCurrentUser = (req, res, next) => User
   .findById(req.user._id)
@@ -56,10 +62,14 @@ const createUser = async (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        throw new ConflictError('User duplicate');
+        next(new ConflictError('User duplicate'));
       }
-    })
-    .catch(next);
+      if (err.name === 'ValidatonError') {
+        next(new WrongDataError('Error DB validation'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const updateProfileInfo = (req, res, next) => User
@@ -80,7 +90,13 @@ const updateProfileInfo = (req, res, next) => User
     }
     return res.send(user);
   })
-  .catch(next);
+  .catch((err) => {
+    if (err.name === 'ValidatonError') {
+      next(new WrongDataError('Error DB validation'));
+    } else {
+      next(err);
+    }
+  });
 
 const updateUserAvatar = (req, res, next) => User
   .findByIdAndUpdate(
@@ -99,7 +115,13 @@ const updateUserAvatar = (req, res, next) => User
     }
     return res.send(user);
   })
-  .catch(next);
+  .catch((err) => {
+    if (err.name === 'ValidatonError') {
+      next(new WrongDataError('Error DB validation'));
+    } else {
+      next(err);
+    }
+  });
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
