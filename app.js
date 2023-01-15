@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyparser = require('body-parser');
+// const bodyparser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -37,11 +37,6 @@ app.use('*', error);
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  if (err.code === 11000) {
-    res
-      .status(409)
-      .send({ message: 'User duplicate' });
-  }
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)

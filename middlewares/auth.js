@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
     const err = new NonExistingDataError('Необходима авторизация');
-    next(err);
+    return next(err);
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (e) {
     const err = new NonExistingDataError('Неверный токен');
-    next(err);
+    return next(err);
   }
 
   req.user = payload;

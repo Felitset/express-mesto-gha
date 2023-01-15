@@ -34,9 +34,12 @@ const deleteCard = (req, res, next) => {
         throw new NotFoundError('Карточка не существует');
       }
       if (card.owner.toString() !== req.user._id) {
-        throw new AccessError('Yевозможно удалить не свою карточку');
+        throw new AccessError('Невозможно удалить не свою карточку');
       }
-      return card.deleteOne(() => res.status(200).json({ message: 'Card deleted successfuly' }));
+      card.deleteOne();
+    })
+    .then(() => {
+      res.status(200).json({ message: 'Card deleted successfuly' });
     })
     .catch(next);
 };
@@ -52,7 +55,7 @@ const setLike = (req, res, next) => {
       if (!cardId) {
         throw new NotFoundError('Карточка не найдена');
       } else {
-        res.json({ message: 'Поставлен лайк' });
+        res.json(cardId);
       }
     })
     .catch(next);
@@ -69,7 +72,7 @@ const removeLike = (req, res, next) => {
       if (!cardId) {
         throw new NotFoundError('Карточка не найдена');
       } else {
-        res.json({ message: 'Like removed from card' });
+        res.json(cardId);
       }
     })
     .catch(next);

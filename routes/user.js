@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-Joi.objectId = require('joi-objectid')(Joi);
 const urlRegex = require('../consts/url-regex');
 
 const {
@@ -14,7 +13,7 @@ const {
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
 router.get('/:userId', celebrate({
-  params: { userId: Joi.objectId() },
+  params: { userId: Joi.string().hex().length(24).required() },
 }), getUser);
 router.patch('/me', celebrate({
   body: Joi.object().keys({

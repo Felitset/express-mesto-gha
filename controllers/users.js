@@ -5,6 +5,7 @@ const User = require('../models/user');
 const NonExistingDataError = require('../errors/non-existing-data');
 const WrongDataError = require('../errors/wrong-data');
 const NotFoundError = require('../errors/not-found-error');
+const ConflictError = require('../errors/conflict-error');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -53,6 +54,11 @@ const createUser = async (req, res, next) => {
         email: req.body.email,
       });
     })
+    .catch((err) => {
+      if (err.code === 11000) {
+        throw new ConflictError('User duplicate');
+      }
+    })
     .catch(next);
 };
 
@@ -95,21 +101,10 @@ const updateUserAvatar = (req, res, next) => User
   })
   .catch(next);
 
-const login = async (req, res, next) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
-  await User.findUserByCredentials(email, password)
-    .then((user) => {
-      if (!user) {
-        throw new NonExistingDataError('Нет пользователя с таким id');
-      }
-      if (!user.password) {
-        throw new NonExistingDataError('Неправильные пароль или почта');
-      }
-      if (!bcrypt.compare(password, user.password)) {
-        throw new WrongDataError('Неправильные пароль или почта');
-      }
-      return user;
-    })
+  User
+    .findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },

@@ -42,17 +42,16 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(email,
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new NonExistingDataError('User is not found');
+        throw new WrongDataError('Wrong login or password');
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new WrongDataError('Password did not match');
+            throw new WrongDataError('Wrong login or password');
           }
           return user;
         });
-    })
-    .catch(next);
+    });
 };
 
 const user = mongoose.model('user', userSchema);
