@@ -1,9 +1,8 @@
 const Card = require('../models/card');
 
-const WrongDataError = require('../errors/wrong-data');
-
-const NotFoundError = require('../errors/not-found-error');
-const AccessError = require('../errors/access-error');
+const BadRequestError = require('../errors/400-bad-request');
+const NotFoundError = require('../errors/404-not-found');
+const AccessError = require('../errors/403-forbidden');
 
 const getAllCards = (req, res, next) => Card
   .find({}).populate('owner').populate('likes')
@@ -23,7 +22,7 @@ const postCard = async (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidatonError') {
-        next(new WrongDataError('Error DB validation'));
+        next(new BadRequestError('Error DB validation'));
       } else {
         next(err);
       }
@@ -48,7 +47,7 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new WrongDataError('WrongData'));
+        next(new BadRequestError('WrongData'));
       } else {
         next(err);
       }
@@ -72,7 +71,7 @@ const setLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new WrongDataError('WrongData'));
+        next(new BadRequestError('WrongData'));
       } else {
         next(err);
       }
@@ -96,7 +95,7 @@ const removeLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new WrongDataError('WrongData'));
+        next(new BadRequestError('WrongData'));
       } else {
         next(err);
       }

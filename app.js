@@ -48,6 +48,4 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => {
-  // console.log(`listening on ${PORT}`);
-});
+app.listen(PORT);

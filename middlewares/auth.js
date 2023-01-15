@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
-const NonExistingDataError = require('../errors/non-existing-data');
+const UnauthorizedError = require('../errors/401-unauthorized');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    const err = new NonExistingDataError('Необходима авторизация');
+    const err = new UnauthorizedError('Необходима авторизация');
     return next(err);
   }
 
@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'some-secret-key');
   } catch (e) {
-    const err = new NonExistingDataError('Неверный токен');
+    const err = new UnauthorizedError('Неверный токен');
     return next(err);
   }
 

@@ -1,4 +1,4 @@
-const NotFoundError = require('../errors/not-found-error');
+const NotFoundError = require('../errors/404-not-found');
 
 const pageNotFound = (req, res, next) => {
   next(new NotFoundError('Page not found'));
