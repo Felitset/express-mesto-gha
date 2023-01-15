@@ -1,8 +1,8 @@
 const Card = require('../models/card');
 
 const BadRequestError = require('../errors/400-bad-request');
-const NotFoundError = require('../errors/404-not-found');
 const AccessError = require('../errors/403-forbidden');
+const NotFoundError = require('../errors/404-not-found');
 
 const getAllCards = (req, res, next) => Card
   .find({}).populate('owner').populate('likes')
