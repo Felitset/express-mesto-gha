@@ -11,14 +11,13 @@ const getAllCards = (req, res, next) => Card
   })
   .catch(next);
 
-const postCard = async (req, res, next) => {
+const postCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
-  const card = await Card
-    .create({ name, link, owner });
-  Card.findById(card._id).populate('owner')
-    .then((newcard) => {
-      res.json(newcard);
+  return Card
+    .create({ name, link, owner })
+    .then((card) => {
+      res.json(card);
     })
     .catch((err) => {
       if (err.name === 'ValidatonError') {
@@ -40,7 +39,7 @@ const deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new AccessError('Невозможно удалить не свою карточку');
       }
-      card.deleteOne();
+      return card.deleteOne();
     })
     .then(() => {
       res.status(200).json({ message: 'Card deleted successfuly' });
