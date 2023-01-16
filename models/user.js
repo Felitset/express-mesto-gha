@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const BadRequestError = require('../errors/400-bad-request');
 const UnauthorizedError = require('../errors/401-unauthorized');
 
 const userSchema = new mongoose.Schema({
@@ -47,7 +46,7 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(email,
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new BadRequestError('Wrong login or password');
+            throw new UnauthorizedError('Wrong login or password');
           }
           return user;
         });
